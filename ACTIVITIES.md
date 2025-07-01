@@ -124,7 +124,8 @@
 
 | **Task Type**             | **Keyword(s) Detected**            | **Temperature** | **Dynamic System Prompt**                                                                               |
 | ------------------------- | ---------------------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
-| 📝 Summarization          | `"summarize"`, `"summary"`         | `0.3`           | "You are a concise summarizer. Provide a clear, structured summary in 3–4 bullet points."               |
+| ℹ️ Infromation            | `"beginner"`                       | `0.3`           | "You are a teacher. xplain the following concept to a 12-year-old in fewer than 150 words"              |
+| 📝 Summarization          | `"summarize"`, `"summary"`         | `0.3`           | "You are a concise summarizer. Provide a clear, structured summary in one paragraph"                    |
 | ✍️ Formal Rewriting       | `"rewrite"` + `"formal"`           | `0.4`           | "You are a professional editor. Rewrite the paragraph in a polished, formal tone."                      |
 | 🤖 Short Storytelling     | `"story"`, `"write a short story"` | `0.9`           | "You are a creative writer. Write a short, imaginative story (100–150 words) with emotion and a twist." |
 | 🧮 Arithmetic Reasoning   | `"how many packs"`                 | `0.2`           | "You are a math tutor. Solve the word problem step-by-step with clear explanations."                    |
@@ -177,10 +178,7 @@ Intorducing this mapper alone it makes the assistant feel more intelligent, natu
    - **Response**:
 
    ```
-    - The US stock market experienced significant volatility in 2023, with a tumble in March and April, followed by a recovery in May and June.
-    - The S&P 500 hit a record high in February but dropped due to President Trump's tariff policy announcements.
-    - The market saw a sharp rally in April after Trump reversed some tariffs, with the S&P 500 gaining 6.15% in May and 3% in June, recovering market value lost in April.
-    - Despite the fluctuations, the index is up more than 3.5% year-to-date.
+   The US stock market experienced volatility this year, with the S&P 500 hitting record highs in February before tumbling due to President Trump's tariff policy. The index recovered in May and June, posting gains of more than 3.5% year-to-date. Despite significant losses in April, the market rebounded after Trump's tariff adjustments, with the S&P 500 showing its best monthly gain since 2023 in May and recovering trillions of dollars in market value since April.
    ```
 
    - **Evaluation**: Natural, paragraph-style summary that improves readability
