@@ -66,3 +66,188 @@ Follow these steps to prepare and submit your homework:
     ```
     embedding_dim =  # YOUR ANSWER HERE
     ```
+
+# LangGraph RAG System
+
+A complete RAG (Retrieval-Augmented Generation) system built with LangGraph and LangChain for answering questions about student loan documents.
+
+## Features
+
+- **Document Loading**: Loads PDF documents from the `data/` directory
+- **Text Chunking**: Splits documents into manageable chunks using RecursiveCharacterTextSplitter
+- **Vector Embeddings**: Uses OpenAI's text-embedding-3-small model for document embeddings
+- **Vector Database**: Stores embeddings in Qdrant vector database
+- **LangGraph Pipeline**: Implements a two-node graph (retrieve → generate) for RAG
+- **OpenAI Integration**: Uses GPT-4.1-nano for response generation
+
+## Setup
+
+1. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Set up OpenAI API Key**:
+   - You'll be prompted to enter your OpenAI API key when running the script
+   - Or set it as an environment variable: `export OPENAI_API_KEY="your-key-here"`
+
+3. **Prepare Data**:
+   - Place your PDF documents in the `data/` directory
+   - The system will automatically load all PDF files from this directory
+
+## Usage
+
+### Running the Complete System
+
+```bash
+python langgraph_rag_system.py
+```
+
+This will:
+1. Load and process all PDF documents from the `data/` directory
+2. Chunk the documents into smaller pieces
+3. Create embeddings and store them in a Qdrant vector database
+4. Build a LangGraph with retrieve and generate nodes
+5. Test the system with sample queries
+
+### Using the System Programmatically
+
+```python
+from langgraph_rag_system import build_rag_graph, load_and_process_documents, chunk_documents, setup_vector_store
+
+# Load and process documents
+documents = load_and_process_documents()
+chunks = chunk_documents(documents)
+
+# Set up vector store and retriever
+vector_store = setup_vector_store(chunks)
+retriever = vector_store.as_retriever(search_kwargs={"k": 5})
+
+# Build the graph
+graph = build_rag_graph(retriever)
+
+# Query the system
+response = graph.invoke({"question": "What is the maximum loan amount for students?"})
+print(response["response"])
+```
+
+## System Architecture
+
+### State Definition
+```python
+class State(TypedDict):
+    question: str
+    context: list[Document]
+    response: str
+```
+
+### Graph Nodes
+
+1. **Retrieve Node**: 
+   - Takes a question from the state
+   - Retrieves relevant documents using the vector retriever
+   - Updates the state with retrieved context
+
+2. **Generate Node**:
+   - Takes the question and context from the state
+   - Generates a response using the LLM chain
+   - Updates the state with the final response
+
+### Graph Flow
+```
+START → retrieve → generate → END
+```
+
+## Configuration
+
+### Embedding Model
+- Model: `text-embedding-3-small`
+- Dimension: 1536
+- Distance Metric: Cosine
+
+### Text Chunking
+- Chunk Size: 750 tokens
+- Chunk Overlap: 0
+- Tokenizer: tiktoken (GPT-4o)
+
+### LLM
+- Model: `gpt-4.1-nano`
+- Temperature: Default
+- Max Tokens: Default
+
+### Vector Retrieval
+- Number of documents retrieved: 5
+- Distance metric: Cosine similarity
+
+## Customization
+
+### Adding New Document Types
+To support different document types, modify the `load_and_process_documents()` function:
+
+```python
+from langchain_community.document_loaders import CSVLoader, TextLoader
+
+def load_and_process_documents():
+    # Load PDFs
+    pdf_loader = DirectoryLoader("data", glob="**/*.pdf", loader_cls=PyMuPDFLoader)
+    pdf_docs = pdf_loader.load()
+    
+    # Load CSVs
+    csv_loader = DirectoryLoader("data", glob="**/*.csv", loader_cls=CSVLoader)
+    csv_docs = csv_loader.load()
+    
+    return pdf_docs + csv_docs
+```
+
+### Modifying the Prompt Template
+To change how the system generates responses, modify the `HUMAN_TEMPLATE` in `create_generator_chain()`:
+
+```python
+HUMAN_TEMPLATE = """
+Based on the following context, answer the user's question:
+
+Context: {context}
+Question: {query}
+
+Provide a clear and accurate answer based only on the provided context.
+"""
+```
+
+### Adding New Graph Nodes
+To extend the graph with additional processing steps:
+
+```python
+def create_validate_node():
+    def validate(state: State) -> State:
+        # Add validation logic here
+        return state
+    return validate
+
+# Add to graph
+graph_builder = graph_builder.add_sequence([retrieve, validate, generate])
+```
+
+## Testing
+
+The system includes built-in tests with sample queries:
+- Student loan questions (should return relevant answers)
+- Out-of-domain questions (should return "I don't know")
+
+## Troubleshooting
+
+### Common Issues
+
+1. **OpenAI API Key Error**: Make sure your API key is valid and has sufficient credits
+2. **Memory Issues**: For large document collections, consider using a persistent Qdrant instance
+3. **Import Errors**: Ensure all dependencies are installed with the correct versions
+
+### Performance Optimization
+
+- Use a persistent Qdrant instance for production
+- Implement caching for frequently asked questions
+- Consider using a more powerful LLM for complex queries
+- Implement parallel processing for large document collections
+
+## License
+
+This project is for educational purposes. Please ensure you comply with OpenAI's usage policies and terms of service.
