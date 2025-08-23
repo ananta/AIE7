@@ -53,10 +53,27 @@ Run the repository and complete the following:
 
 What is the purpose of the `chunk_overlap` parameter when using `RecursiveCharacterTextSplitter` to prepare documents for RAG, and what trade-offs arise as you increase or decrease its value?
 
+✅ Overlap keeps context across chunk boundaries so no important info is lost.
+
+Small overlap → faster, cheaper, good for clean text.
+Medium overlap → balanced, works well for most docs.
+Large overlap → useful for technical text, code, or legal docs where details cross chunk boundaries.
+
 #### ❓ Question:
 
 Your retriever is configured with `search_kwargs={"k": 5}`. How would adjusting `k` likely affect RAGAS metrics such as Context Precision and Context Recall in practice, and why?
 
+✅ `k` decides how many chunks are retrieved. Lower k = more precise, higher k = more coverage.
+
+Small k → short, focused answers (precision).
+Large k → broad coverage when answer may be spread out (recall).
+Tune based on whether you value accuracy or completeness.
+
 #### ❓ Question:
 
 Compare the `agent` and `agent_helpful` assistants defined in `langgraph.json`. Where does the helpfulness evaluator fit in the graph, and under what condition should execution route back to the agent vs. terminate?
+
+✅ agent gives an answer directly. agent_helpful checks if the answer is good; if not, it loops back for a better one.
+
+agent → quick responses when speed matters.
+agent_helpful → higher-quality responses when helpfulness is critical (e.g., customer support, tutoring).
